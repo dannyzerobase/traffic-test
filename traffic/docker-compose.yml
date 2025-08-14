@@ -53,20 +53,13 @@ services:
         reservations:
           cpus: '0.5'
           memory: 512M
-  mysqld-exporter:
-    image: prom/mysqld-exporter:v0.16.0
-    container_name: mysqld-exporter
+  traffic-redis:
+    image: redis:6.2
+    container_name: redis
     ports:
-      - "9104:9104"
-    command:
-      - "--mysqld.username=root:mysql_password"
-      - "--mysqld.address=traffic-db:3306"
+      - "6379:6379"
     networks:
       - traffic-network
-    volumes:
-      - mysqld_exporter_data:/var/lib/mysqld_exporter
-    depends_on:
-      - traffic-db
     deploy:
       resources:
         limits:
@@ -76,34 +69,16 @@ services:
           cpus: '0.5'
           memory: 512M
   redis-exporter:
-    image: oliver006/redis_exporter:v1.67.0
+    image: oliver006/redis_exporter:latest
     container_name: redis-exporter
     environment:
       - REDIS_ADDR=traffic-redis:6379
     ports:
       - "9121:9121"
-    networks:
-      - traffic-network
     depends_on:
       - traffic-redis
-    deploy:
-      resources:
-        limits:
-          cpus: '1.0'
-          memory: 1024M
-        reservations:
-          cpus: '0.5'
-          memory: 512M
-  prometheus:
-    image: prom/prometheus:v3.1.0
-    container_name: prometheus
-    ports:
-      - "9090:9090"
     volumes:
-      - prometheus_data:/var/lib/prometheus
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-    networks:
-      - traffic-network
+      - redis_exporter_data:/var/lib/redis_exporter
     deploy:
       resources:
         limits:
@@ -139,7 +114,7 @@ services:
     volumes:
       - db_data:/var/lib/mysql
     ports:
-      - "3306:3306"
+      - "3307:3306"
     networks:
       - traffic-network
     environment:
@@ -160,13 +135,37 @@ services:
         reservations:
           cpus: '0.5'
           memory: 512M
-  traffic-redis:
-    image: redis:7.4.2
-    container_name: redis
+  mysqld-exporter:
+    image: prom/mysqld-exporter:latest
+    container_name: mysqld-exporter
+    command:
+      - "--mysqld.username=root:mysql_password"
+      - "--mysqld.address=traffic-db:3306"
     ports:
-      - "6379:6379"
+      - "9104:9104"
+    networks:
+      - traffic-network
     volumes:
-      - redis_data:/var/lib/redis
+      - mysqld_exporter_data:/var/lib/mysqld_exporter
+    depends_on:
+      - traffic-db
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1024M
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - prometheus_data:/var/lib/prometheus
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
     networks:
       - traffic-network
     deploy:
@@ -183,7 +182,7 @@ networks:
 
 volumes:
   db_data:
-  grafana_data:
   prometheus_data:
   mysqld_exporter_data:
-  redis_data:
+  redis_exporter_data:
+  grafana_data:
