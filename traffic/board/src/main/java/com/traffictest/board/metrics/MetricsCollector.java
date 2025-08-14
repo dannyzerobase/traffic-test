@@ -12,12 +12,13 @@ import org.springframework.stereotype.Component;
 public class MetricsCollector {
     private final PrometheusMeterRegistry registry;
 
-    public void count(final String metricsName, final String... tags){
-        try{
-            Counter counter = registry.counter(metricsName,tags);
+    public void count(final String metricsName, final String... tags) {
+        try {
+            Counter counter = registry.counter(metricsName, tags);
             counter.increment();
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("Error while counting metrics", e);
         }
     }
+
 }

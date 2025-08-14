@@ -10,8 +10,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Slf4j
 @RestController
-@RequestMapping("/metrics")
 @RequiredArgsConstructor
+@RequestMapping("/metrics")
 public class CustomMetricController {
 
     private final MetricsCollector metricsCollector;
@@ -19,20 +19,19 @@ public class CustomMetricController {
     private final WebClient webClient = WebClient.builder().baseUrl("http://statistics-app:8191").build();
 
     @GetMapping
-    public int tester() {
-
+    public int tester(){
 
         int result = 0;
-        for (int i = 0; i < 10; i++) {
+        for(int i=0;i<10;i++){
             try {
                 webClient.get().uri("/metrics")
                         .retrieve().bodyToMono(String.class)
                         .block();
-                result++;
-                metricsCollector.count("CUSTOM_METRIC", "tag","success");
-            } catch (RuntimeException e) {
-                metricsCollector.count("CUSTOM_METRIC", "tag","fail");
-                log.warn("exception:", e);
+                result ++;
+                metricsCollector.count("CUSTOM_METRIC","tag","success");
+            }catch (RuntimeException e){
+                metricsCollector.count("CUSTOM_METRIC","tag","fail");
+                log.warn("exception : ",e);
             }
         }
         return result;
