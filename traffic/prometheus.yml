@@ -16,6 +16,6 @@ scrape_configs:
   - job_name: 'mariadb'
     static_configs:
       - targets: ['mysqld-exporter:9104']
-  - job_name: 'redus'
+  - job_name: 'redis'
     static_configs:
       - targets: ['redis-exporter:9121']

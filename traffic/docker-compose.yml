@@ -87,6 +87,26 @@ services:
         reservations:
           cpus: '0.5'
           memory: 512M
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    networks:
+      - traffic-network
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1024M
+        reservations:
+          cpus: '0.5'
+          memory: 512M
   ## mariadb
   traffic-db:
     image: mariadb:latest
@@ -94,7 +114,7 @@ services:
     volumes:
       - db_data:/var/lib/mysql
     ports:
-      - "3306:3306"
+      - "3307:3306"
     networks:
       - traffic-network
     environment:
@@ -165,4 +185,4 @@ volumes:
   prometheus_data:
   mysqld_exporter_data:
   redis_exporter_data:
-#  grafana_data:
+  grafana_data:
