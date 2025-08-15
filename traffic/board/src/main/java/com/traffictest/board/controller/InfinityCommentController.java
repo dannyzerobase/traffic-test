@@ -39,4 +39,12 @@ public class InfinityCommentController {
         return endTime - startTime;
     }
 
+    @GetMapping("/enhanced-init")
+    public long enhancedInit(@RequestParam(defaultValue = "50000") Integer count) {
+        long startTime = System.currentTimeMillis();
+        infinityCommentInitService.enhancedInit(count);
+        long endTime = System.currentTimeMillis();
+        return endTime - startTime;
+    }
+
 }

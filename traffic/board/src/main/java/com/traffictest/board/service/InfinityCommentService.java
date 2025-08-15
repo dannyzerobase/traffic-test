@@ -56,4 +56,56 @@ public class InfinityCommentService {
         }
     }
 
+    public void enhancedInit(int count){
+        int counter = 0;
+        List<User> users = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            users.add(User.builder()
+                    .username("user" + i)
+                    .build());
+        }
+        userRepository.saveAll(users);
+
+        List<InfinityComment> buffer = new ArrayList<>();
+        InfinityComment comment = InfinityComment.builder()
+                .content("comment = " + counter)
+                .writer(users.get(0))
+                .build();
+        counter++;
+        buffer.add(comment);
+        List<InfinityComment> parents = new ArrayList<>();
+        List<InfinityComment> childrens = new ArrayList<>();
+        parents.add(comment);
+        while (counter < count) {
+
+            for(InfinityComment parent : parents){
+                for (int i=0; i<parents.size() * 2; i++){
+                    comment= InfinityComment.builder()
+                            .content("comment = " + counter)
+                            .parent(parent)
+                            .writer(users.get(counter++ % 10))
+                            .build();
+                    childrens.add(comment);
+                    buffer.add(comment);
+
+                    if (buffer.size() == 1000){
+                        infinityCommentRepository.saveAll(buffer);
+                        buffer.clear();
+                    }
+                    if (counter ==count){
+                        infinityCommentRepository.saveAll(buffer);
+                        return;
+                    }
+                }
+
+
+            }
+            parents.clear();
+            parents= childrens;
+            childrens = new ArrayList<>();
+
+
+        }
+    }
+
 }
