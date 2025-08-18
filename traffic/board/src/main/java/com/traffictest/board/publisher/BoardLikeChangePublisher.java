@@ -12,6 +12,8 @@ public class BoardLikeChangePublisher {
     private final RedisPublisher redisPublisher;
 
     public void publish(Long boardId){
+
+
         redisPublisher.publish(topic,boardId);
     }
 }
