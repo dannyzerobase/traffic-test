@@ -20,9 +20,9 @@ public class BoardLikeController {
         boardLikeService.switchLikeState(boardId, userId);
     }
 
-    @GetMapping("/toggle-transaction")
-    public void switchBoardLikeStateTransaction(@RequestParam Long boardId, @RequestParam Long userId) {
-        boardLikeService.switchLikeStateWithTransaction(boardId, userId);
-        boardLikeService.switchLikeStateWithTransaction(boardId, userId);
+    @GetMapping("/toggle-transaction-lock")
+    public void switchBoardLikeStateTransactionLock(@RequestParam Long boardId, @RequestParam Long userId) {
+        boardLikeService.switchLikeStateWithTransactionWithLock(boardId, userId);
+        boardLikeService.switchLikeStateWithTransactionWithLock(boardId, userId);
     }
 }
