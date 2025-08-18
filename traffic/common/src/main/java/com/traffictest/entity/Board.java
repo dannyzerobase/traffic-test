@@ -24,4 +24,7 @@ public class Board extends BaseEntity {
     private String content;
     @ManyToOne(fetch = FetchType.LAZY)
     private User writer;
+
+    @Column(nullable = false)
+    private int likeCount;
 }
