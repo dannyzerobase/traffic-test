@@ -19,6 +19,8 @@ public class CacheService {
     @Cacheable(cacheNames = "redis", key = "#id", cacheManager = "redisCacheManager")
     public CacheObject getFromRedis(Long id){
         return makeObject(id);
+
+
     }
 
     private CacheObject makeObject(Long id){
