@@ -4,6 +4,7 @@ plugins {
 
 group = 'com.traffictest'
 version = 'unspecified'
+bootJar.enabled = false
 
 repositories {
     mavenCentral()
@@ -14,6 +15,9 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter'
 }
 
+
+
 test {
     useJUnitPlatform()
 }
+

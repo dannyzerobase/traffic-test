@@ -40,7 +40,29 @@ subprojects {
 	dependencies { // 모든 하위 모듈에 추가 될 의존성 목록입니다.
 		implementation 'org.springframework.boot:spring-boot-starter'
 		implementation 'org.springframework.boot:spring-boot-starter-web'
+		implementation 'org.springframework.boot:spring-boot-starter-webflux'
 		testImplementation 'org.springframework.boot:spring-boot-starter-test'
+		implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+		implementation 'net.datafaker:datafaker:2.4.2'
+//		querydsl
+		implementation 'com.querydsl:querydsl-jpa:5.1.0:jakarta'
+		implementation "com.querydsl:querydsl-core:5.1.0"
+		annotationProcessor 'com.querydsl:querydsl-apt:5.1.0:jakarta'
+		annotationProcessor 'jakarta.annotation:jakarta.annotation-api:3.0.0'
+		annotationProcessor 'jakarta.persistence:jakarta.persistence-api:3.2.0'
+
+//		redis
+		implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+		implementation 'com.github.ben-manes.caffeine:caffeine:3.1.8'
+
+		implementation 'com.fasterxml.jackson.datatype:jackson-datatype-hibernate5-jakarta'
+		implementation 'com.bucket4j:bucket4j-core:8.7.0'
+
+		implementation 'io.micrometer:micrometer-registry-prometheus'
+		implementation 'org.springframework.boot:spring-boot-starter-actuator'
+		implementation 'org.mariadb.jdbc:mariadb-java-client'
+		compileOnly 'org.projectlombok:lombok'
+		annotationProcessor 'org.projectlombok:lombok'
 	}
 
 	test {
@@ -48,13 +70,15 @@ subprojects {
 	}
 
 }
-//
-//dependencies {
-//	implementation 'org.springframework.boot:spring-boot-starter'
-//	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-//	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-//}
-//
-//tasks.named('test') {
-//	useJUnitPlatform()
-//}
+
+def generated = layout.buildDirectory.dir("generated/querydsl").get().asFile
+
+sourceSets {
+	main.java.srcDirs += [ generated]
+}
+tasks.withType(JavaCompile).configureEach {
+	options.generatedSourceOutputDirectory = file(generated)
+}
+clean.doLast {
+	delete file (generated)
+}

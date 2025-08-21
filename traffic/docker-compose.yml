@@ -45,6 +45,46 @@ services:
       - traffic-network
     depends_on:
       - traffic-db
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1024M
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+  mysqld-exporter:
+    image: prom/mysqld-exporter:v0.16.0
+    container_name: mysqld-exporter
+    ports:
+      - "9104:9104"
+    command:
+      - "--mysqld.username=root:mysql_password"
+      - "--mysqld.address=traffic-db:3306"
+    networks:
+      - traffic-network
+    volumes:
+      - mysqld_exporter_data:/var/lib/mysqld_exporter
+    depends_on:
+      - traffic-db
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1024M
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+  redis-exporter:
+    image: oliver006/redis_exporter:v1.67.0
+    container_name: redis-exporter
+    environment:
+      - REDIS_ADDR=traffic-redis:6379
+    ports:
+      - "9121:9121"
+    networks:
+      - traffic-network
+    depends_on:
       - traffic-redis
     deploy:
       resources:
@@ -54,36 +94,16 @@ services:
         reservations:
           cpus: '0.5'
           memory: 512M
-  traffic-redis:
-    image: redis:6.2
-    container_name: redis
+  prometheus:
+    image: prom/prometheus:v3.1.0
+    container_name: prometheus
     ports:
-      - "6379:6379"
-    networks:
-      - traffic-network
-    deploy:
-      resources:
-        limits:
-          cpus: '1.0'
-          memory: 1024M
-        reservations:
-          cpus: '0.5'
-          memory: 512M
-  traffic-db:
-    image: mariadb:10.5
-    container_name: traffic-db
+      - "9090:9090"
     volumes:
-      - db_data:/var/lib/mysql
-    ports:
-      - "3306:3306"
+      - prometheus_data:/var/lib/prometheus
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
     networks:
       - traffic-network
-    environment:
-      - MYSQL_ROOT_PASSWORD=mysql_password
-      - MYSQL_DATABASE=traffic
-      - MYSQL_USER=traffic
-      - MYSQL_PASSWORD=traffic-password
-    command: [ '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci' ]
     deploy:
       resources:
         limits:
@@ -112,6 +132,51 @@ services:
         reservations:
           cpus: '0.5'
           memory: 512M
+  ## mariadb
+  traffic-db:
+    image: mariadb:latest
+    container_name: traffic-db
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3307:3306"
+    networks:
+      - traffic-network
+    environment:
+      # please careful account info
+      - MYSQL_ROOT_PASSWORD=mysql_password
+      - MYSQL_DATABASE=traffic
+      - MYSQL_USER=traffic
+      - MYSQL_PASSWORD=traffic-password
+      - MARIADB_AUTO_UPGRADE=1
+    command: [ '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci',
+               '--query_cache_size=0',
+               '--query_cache_type=0']
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1024M
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+  traffic-redis:
+    image: redis:7.4.2
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/var/lib/redis
+    networks:
+      - traffic-network
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1024M
+        reservations:
+          cpus: '0.5'
+          memory: 512M
 networks:
   traffic-network:
     driver: bridge
@@ -119,3 +184,6 @@ networks:
 volumes:
   db_data:
   grafana_data:
+  prometheus_data:
+  mysqld_exporter_data:
+  redis_data:

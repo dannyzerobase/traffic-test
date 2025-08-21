@@ -1,0 +1,21 @@
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+
+scrape_configs:
+  - job_name: 'statistics-service'
+    metrics_path: 'actuator/prometheus'
+    scrape_interval: 1s
+    static_configs:
+      - targets: ['statistics-app:8191']
+  - job_name: 'board-service'
+    metrics_path: 'actuator/prometheus'
+    scrape_interval: 1s
+    static_configs:
+      - targets: ['board-app:8190']
+  - job_name: 'mariadb'
+    static_configs:
+      - targets: [ 'mysqld-exporter:9104' ]
+  - job_name: 'redis'
+    static_configs:
+      - targets: [ 'redis-exporter:9121' ]
