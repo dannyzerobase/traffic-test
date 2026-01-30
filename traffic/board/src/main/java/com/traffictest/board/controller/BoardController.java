@@ -24,6 +24,11 @@ public class BoardController {
     public List<BoardSummaryDto> getBoard(@RequestParam String hashTag, @RequestParam String subjectLike) {
         return boardService.findByHashTagAndSubject(hashTag, subjectLike);
     }
+
+    @GetMapping("/statistics/health")
+    public int callStatisticsHealth(@RequestParam int count) {
+        return boardService.callStatisticsHealth(count);
+    }
     // 5000개 기준 15분 정도 시간 소요
     // 기본 index 있을 시 200ms 가량
     // index 추가 시 100ms 가량
